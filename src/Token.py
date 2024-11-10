@@ -57,4 +57,4 @@ class Token:
     Line : int
     
     def __str__(self):
-        return str(self.Type) + ' ' + str(self.Lexeme) + ' ' + str(self.Literal) + ', Line: ' + str(self.Line)
+        return self.Type.name + ' ' + str(self.Lexeme) + ' ' + str(self.Literal) + ', Line: ' + str(self.Line)

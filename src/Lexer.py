@@ -36,10 +36,7 @@ class Scanner:
         return self.__source[self.__current : self.__current + 1]
     
     def __addToken(self, Type : TokenType, Literal = None):
-        text = self.__source[self.__start : self.__current + 1]
-        
-        if str.startswith(text, '\n') == True:
-            text = str.replace(text, ' ', '')
+        text = self.__source[self.__start + 1 : self.__current + 1]
         
         self.__tokens.append(
             Token(Type, text, Literal, self.__line)
@@ -111,13 +108,54 @@ class Scanner:
             case '[': self.__addToken(TokenType.RIGHT_BRACKET)
             case ']': self.__addToken(TokenType.LEFT_BRACKET)
             
+            case '#': self.__addToken(TokenType.HASH)
+            case '$': self.__addToken(TokenType.DOLLAR)
+            case '&': self.__addToken(TokenType.AMP)
+            case '|': self.__addToken(TokenType.PIPE)
+            
             case ',': self.__addToken(TokenType.COMMA)
             case '.': self.__addToken(TokenType.DOT)
             case ':': self.__addToken(TokenType.COLON)
             case ';': self.__addToken(TokenType.SEMICOLON)
             case '~': self.__addToken(TokenType.TILDE)
             
-            case '=': self.__addToken(TokenType.EQUAL)
+            case '+': self.__addToken(TokenType.PLUS)
+            case '-': self.__addToken(TokenType.MINUS)
+            case '*': self.__addToken(TokenType.STAR)
+            
+            
+            case '/':
+                if self.__match('/'):
+                    while self.__peek() != '\n' and not self.__isAtEnd():
+                        self.__advance()
+                else:
+                    self.__addToken(TokenType.SLASH)
+            
+            
+            
+            case '=':
+                if self.__match('='):
+                    self.__addToken(TokenType.EQUAL_EQUAL)
+                else:
+                    self.__addToken(TokenType.EQUAL)
+            
+            case '>':
+                if self.__match('='):
+                    self.__addToken(TokenType.GREATER_EQUAL)
+                else:
+                    self.__addToken(TokenType.GREATER)
+            
+            case '<':
+                if self.__match('='):
+                    self.__addToken(TokenType.LESS_EQUAL)
+                else:
+                    self.__addToken(TokenType.LESS)
+            
+            case '!':
+                if self.__match('='):
+                    self.__addToken(TokenType.BANG_EQUAL)
+                else:
+                    self.__addToken(TokenType.BANG)
             
             case '"': self._string()
             case "'": self._string()
@@ -131,6 +169,8 @@ class Scanner:
                     raise SyntaxError('Unexpected Symbol: ' + char)
 
     def scanSource(self) -> list[Token]:
+        self.__source = '\n' + self.__source
+        
         while not self.__isAtEnd() == True:
             self.__start = self.__current
             self._scan()
