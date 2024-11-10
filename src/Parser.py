@@ -1,13 +1,10 @@
-from Token import TokenType, Token
+from Token import TokenType, Token, Keywords
 from AST import *
 
 
 class Parser:
     __current : int = 0
-    __line : int = 1
-    __MethodLevel = 0
-    
-    __scopes = []
+    __MethodLevel : int = 0
     
     
     #--------- Constructor -------------
@@ -34,7 +31,10 @@ class Parser:
             return False
     
     def __peek(self, amount = 1):
-        return self.__tokens[self.__current + amount]
+        try:
+            return self.__tokens[self.__current + amount]
+        except IndexError:
+            return self.__tokens[len(self.__tokens) - 1]
     
     def __advance(self):
         self.__current += 1
@@ -72,7 +72,7 @@ class Parser:
                 
                 args = ""
                 
-                while self.__peek(0).Type != TokenType.RIGHT_PAREN and self.__peek(0).Line == expectedLine:
+                while self.__peek(0).Type != TokenType.RIGHT_PAREN:
                     token = self.__peek(0)
                     args += token.Lexeme
                     self.__advance()
@@ -86,9 +86,74 @@ class Parser:
                 return newcall
             
             
+            elif token.Lexeme == Keywords.FUNCTION.value:
+                
+                # FUNCTION BLOCK 
+                
+                
+                self.__advance() #consume keyword
+                
+                if self.__peek(0).Type != TokenType.IDENTIFIER: raise SyntaxError('Invalid Syntax')
+                funcname = self.__peek(0).Lexeme
+                self.__advance() #consume identifier
+                
+                if self.__peek(0).Type != TokenType.LEFT_PAREN: raise SyntaxError('Invalid Syntax')
+                self.__advance() #consume (
+                expectedLine = token.Line
+                
+                args = ""
+                
+                while self.__peek(0).Type != TokenType.RIGHT_PAREN:
+                    token = self.__peek(0)
+                    args += token.Lexeme
+                    self.__advance()
+
+                    if self.__peek(0).Line != expectedLine:
+                        raise SyntaxError('Invalid Syntax')
+                self.__advance() #consume )
+                
+                StrParameters = args.split(',')
+                
+                paramlist = []
+                
+                for param in StrParameters:
+                    newparam = parameter(param, None)
+                    paramlist.append(newparam)
+                
+                if self.__peek(0).Type != TokenType.LEFT_BRACE: raise SyntaxError('Expected {')
+                self.__advance() #consume {
+                
+                newfunc = Function(funcname, paramlist, parent)
+                
+                while self.__peek(0).Type != TokenType.RIGHT_BRACE:
+                    if self.__peek(0).Type == TokenType.EOF:
+                        raise SyntaxError('Expected <EOF>: }, Invalid Syntax')
+                    
+                    newstatement = self._parse(newfunc)
+                    newfunc.body.append(newstatement)
+                    self.__advance()
+                
+                self.__advance() #consume }
+                
+                return newfunc
+            
+            elif token.Lexeme == Keywords.RETURN.value:
+                self.__advance() #consume RETURN
+                
+                finalValue = ""
+                expectedLine = token.Line
+                
+                while self.__peek().Line == expectedLine:
+                    token = self.__peek(0)
+                    finalValue += token.Lexeme
+                    self.__advance()
+                
+                expr = finalValue
+                newreturn = Return(expr, parent)
             
             
-            if self.__check(TokenType.EQUAL):
+            
+            elif self.__check(TokenType.EQUAL):
                 
                 #Variable block
                 
@@ -96,10 +161,10 @@ class Parser:
                 self.__advance() #consume identifier
                 self.__advance() #consume =
                 
-                finalValue = ""
+                finalValue = ''''''
                 expectedLine = token.Line
                 
-                while self.__peek(0) != TokenType.SEMICOLON and self.__peek(0).Line == expectedLine:
+                while self.__peek().Line == expectedLine:
                     token = self.__peek(0)
                     finalValue += token.Lexeme
                     self.__advance()
@@ -110,6 +175,7 @@ class Parser:
                     newvar = VariableAssignment(varname, expr, parent)
                     return newvar
                 else:
+                    parent.scope.append(varname)
                     newvar = VariableDeclaration(varname, expr, parent)
                     return newvar
             
@@ -124,12 +190,6 @@ class Parser:
             elif token.Type == TokenType.STRING:
                 pass
                 # STRING Block
-        
-        
-        
-        elif token.Line != self.__peek().Line:
-            self.__line += 1
-            return None
     
     
     

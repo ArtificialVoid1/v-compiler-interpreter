@@ -20,4 +20,11 @@ def interpret(source : str) -> None:
     Ast = __GenerateSyntaxTree(source)
     #run code
     
-__GenerateSyntaxTree('print(a, b, c)')
+__GenerateSyntaxTree('''
+
+abc = 2 + 4 / 5
+
+abc = "Hello world!"
+
+
+''')

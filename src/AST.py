@@ -72,21 +72,29 @@ class Return:
 
 #-------------------------------------------------------------------------------
 
+class parameter:
+    def __init__(self, name : str, default_value : Any):
+        self.name = name
+        self.default_value = default_value
+        self.Type = 'parameter'
 class Function:
-    def __init__(self, name : str, parameters : list[str], body : list[Any], parent : Any):
+    def __init__(self, name : str, parameters : list[parameter], parent : Any):
         self.name = name
         self.parameters = parameters
-        self.body = body
+        self.body = []
         self.type = 'function'
         self.scope = []
         self.parent = parent
+        
+        for param in self.parameters:
+            self.scope.append(param)
     def __str__(self):
         final = 'function: ' + self.name + '('
         for param in self.parameters:
             if param == self.parameters[0]:
-                final += param
+                final += param.name
             else:
-                final += ', ' +  param
+                final += ', ' +  param.name
         final += ') {'
         for statement in self.body:
             final += '\n\t' + str(statement)
@@ -179,3 +187,33 @@ class SubClass(Class):
         self.scope += Methods
 
 #-------------------------------------------------------------------------------------------------
+
+
+class Binary:
+    def __init__(self, Left, Right, Operator, parent):
+        self.Left = Left
+        self.Right = Right
+        self.Operator = Operator
+        self.type = 'Binary'
+        self.parent = parent
+    def __str__(self):
+        return ' (' + str(self.Left) + ' ' + self.Operator + ' ' + str(self.Right) + ') '
+
+class addition(Binary):
+    def __init__(self, Left, Right, parent):
+        super().__init__(Left, Right, '+', parent)
+class subtraction(Binary):
+    def __init__(self, Left, Right, parent):
+        super().__init__(Left, Right, '-', parent)
+class multiplication(Binary):
+    def __init__(self, Left, Right, parent):
+        super().__init__(Left, Right, '*', parent)
+class division(Binary):
+    def __init__(self, Left, Right, parent):
+        super().__init__(Left, Right, '/', parent)
+class power(Binary):
+    def __init__(self, Left, Right, parent):
+        super().__init__(Left, Right, '^', parent)
+class mod(Binary):
+    def __init__(self, Left, Right, parent):
+        super().__init__(Left, Right, '%', parent)

@@ -2,6 +2,11 @@ from enum import Enum
 from typing import Any
 from dataclasses import dataclass
 
+class Keywords(Enum):
+    FUNCTION = 'func'
+    CLASS = 'class'
+    RETURN = 'return'
+
 class TokenType(Enum):
     LEFT_PAREN = 0
     RIGHT_PAREN = 1
