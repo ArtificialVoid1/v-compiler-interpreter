@@ -40,14 +40,25 @@ class program:
 
 class Literal:
 
-    def __init__(self, value):
-        if value == 'true':
-            self.value = True
-        elif value == 'false':
-            self.value = False
-        elif value == 'null':
-            self.value == None
-        elif str.isdigit
+    def __init__(self, value, type):
+        match type:
+            case 'true':
+                self.value = True
+                self.type = 'boolean'
+            case 'false':
+                self.value = False
+                self.type = 'boolean'
+            case 'null':
+                self.value = None
+                self.type = 'NoneType'
+            case 'number':
+                self.value = float(value)
+                self.type = 'number'
+            case 'string':
+                self.value = str(value)
+                self.type = 'string'
+    def __str__(self):
+        return '[literal(' + self.type + ')]: ' + str(self.value)
 
 #-------------------------------------------------------------------------------
 
@@ -228,3 +239,19 @@ class power(Binary):
 class mod(Binary):
     def __init__(self, Left, Right, parent):
         super().__init__(Left, Right, '%', parent)
+
+#-----------------------------------------------------
+
+class Unary:
+    def __init__(self, Operator, Right, parent):
+        self.Operator = Operator
+        self.Right = Right
+        self.parent = parent
+        self.type = 'unary'
+    def __str__(self):
+        return ' (' + self.Operator + str(self.Right) + ') '
+class negate(Unary):
+    def __init__(self, Right, parent):
+        super().__init__('-', Right, parent)
+
+
