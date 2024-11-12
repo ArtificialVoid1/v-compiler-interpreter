@@ -38,6 +38,17 @@ class program:
         else:
             raise TypeError('Invalid Type')
 
+class Literal:
+
+    def __init__(self, value):
+        if value == 'true':
+            self.value = True
+        elif value == 'false':
+            self.value = False
+        elif value == 'null':
+            self.value == None
+        elif str.isdigit
+
 #-------------------------------------------------------------------------------
 
 class VariableDeclaration:
