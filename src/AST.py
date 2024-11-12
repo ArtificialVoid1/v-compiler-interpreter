@@ -50,7 +50,7 @@ class Literal:
                 self.type = 'boolean'
             case 'null':
                 self.value = None
-                self.type = 'NoneType'
+                self.type = 'NullType'
             case 'number':
                 self.value = float(value)
                 self.type = 'number'
@@ -212,7 +212,7 @@ class SubClass(Class):
 
 
 class Binary:
-    def __init__(self, Left, Right, Operator, parent):
+    def __init__(self, Left : Any, Right : Any, Operator : str, parent):
         self.Left = Left
         self.Right = Right
         self.Operator = Operator
@@ -243,15 +243,47 @@ class mod(Binary):
 #-----------------------------------------------------
 
 class Unary:
-    def __init__(self, Operator, Right, parent):
+    def __init__(self, Operator : str, Right : Any, parent):
         self.Operator = Operator
         self.Right = Right
         self.parent = parent
         self.type = 'unary'
     def __str__(self):
         return ' (' + self.Operator + str(self.Right) + ') '
-class negate(Unary):
+class UnaryNegate(Unary):
     def __init__(self, Right, parent):
         super().__init__('-', Right, parent)
+class UnaryNot(Unary):
+    def __init__(self, Right, parent):
+        super().__init__('!', Right, parent)
 
+#-----------------------------------------------------
+
+class Condition(Binary):
+    operators = [
+        '==',
+        '>',
+        '>=',
+        '<',
+        '<=',
+        '!=',
+    ]
+    
+    def __init__(self, Left, Right, Operator, parent):
+        if Operator in self.operators:
+            super().__init__(Left, Right, Operator, parent)
+        else:
+            raise SyntaxError('Expected Comparison Operator')
+
+#--------------------------------------------------------------------
+
+class IfStatement:
+    def __init__(self, condition : Condition, parent):
+        self.condition = condition
+        self.body = []
+        self.parent = paren
+
+class Loop(IfStatement):
+    def __init__(self, condition : Condition, parent):
+        super().__init__(condition, parent)
 
