@@ -125,16 +125,6 @@ class Parser:
                 
                 newfunc = Function(funcname, paramlist, parent)
                 
-                while self.__peek(0).Type != TokenType.RIGHT_BRACE:
-                    if self.__peek(0).Type == TokenType.EOF:
-                        raise SyntaxError('Expected <EOF>: }, Invalid Syntax')
-                    
-                    newstatement = self._parse(newfunc)
-                    newfunc.body.append(newstatement)
-                    self.__advance()
-                
-                self.__advance() #consume }
-                
                 return newfunc
             
             elif token.Lexeme == Keywords.RETURN.value:
