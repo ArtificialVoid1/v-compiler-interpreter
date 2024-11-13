@@ -6,6 +6,7 @@ class program:
     def __init__(self):
         self.statements = []
         self.scope = []
+        self.type = 'ast'
     
     def __str__(self) -> str:
         finalstr = ""
