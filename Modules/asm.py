@@ -7,48 +7,94 @@ class Code:
   code : str
   ext : str
 
-calls = {
-  'syscall' : 'int 0x80',
-  
-  'sys_exit' : 'mov eax, 1',
-  'sys_write' : 'mov eax, 4',
-  
+#--------------- Keywords
 
-  'stdout' : 'mov ebx, 1'
-}
+MOV = 'mov '
+JMP = 'jmp '
+CALL = 'call '
 
+
+#---------------- System calls
+
+SYSCALL = 'int 0x80'
+
+SYS_EXIT = 'mov eax, 1'
+SYS_WRITE = 'mov eax, 4'
+
+STDOUT = 'mov ebx, 1'
+
+
+def recursive_gen(statement) -> str:
+
+  if statement.type == 'declaration':
+    return statement.name + ' db ' + str(statement.value) + '\n'
+
+  elif statement.type == 'assignment':
+    return MOV + '[' + statement.name + '], ' + str(statement.value) + '\n'
+
+
+
+  #-------------------- functions
+
+  elif statement.type == 'function':
+    MAIN = ''
+    MAIN += statement.name + ':\n'
+
+      
+  elif statement.type == 'call'
+    
+    if statement.callee == 'print':
+      MAIN = ''
+      message = str.join(statement.arguments)
+      messageLen = len(message)
+        
+      MAIN += MOV + 'edx, ' + messageLen + '\n'
+      MAIN += MOV + 'ecx, ' + message + '\n'
+      MAIN += STDOUT + '\n'
+      MAIN += SYS_WRITE + '\n'
+      MAIN += SYSCALL + '\n'
+      return MAIN
+
+    
+    else:
+      MAIN = ''
+      MAIN += CALL + statement.callee
+      return MAIN
+      
+    
+  #--------- END OF FILE
+
+  elif statement == 'EOF':
+    MAIN = ''
+    MAIN += SYS_EXIT + '\n'
+    MAIN += SYSCALL
+    return MAIN
+
+data_types = ['declaration']
+bss_types = []
+text_types = []
+outer_types = ['function']
+main_types = ['call', 'assignment']
 
 def codegen(syntaxTree) -> Code:
   DATA = 'section .data\n'
   MAIN = '_start:\n'
-  TEXT = 'section .text\n\tglobal _start'
-  
-
+  TEXT = 'section .text\nglobal _start'
+  BSS = 'section .BSS\n'
+  OUTER = ''
 
   for statement in syntaxTree.statements:
 
-    if statement.type == 'declaration':
-      DATA += statement.name + ' db ' + str(statement.value) + '\n'
-
-    elif statement.type == 'assignment':
-      MAIN += 'mov [' + statement.name + '], ' + str(statement.value) + '\n'
+    if statement.type in data_types:
+      DATA += recursive_gen(statement)
       
-    elif statement.type == 'call'
+    elif statement.type in bss_types:
+      BSS += recursive_gen(statement)
 
-      if statement.callee == 'print':
-        message = str.join(statement.arguments)
-        messageLen = len(message)
-        
-        MAIN += 'mov edx, ' + messageLen + '\n'
-        MAIN += 'mov ecx, ' + message + '\n'
-        MAIN += calls.stdout + '\n'
-        MAIN += calls.sys_write + '\n'
-        MAIN += calls.syscall + '\n'
-
-    elif statement == 'EOF':
-      MAIN += calls.sys_exit + '\n'
-      MAIN += calls.syscall
-
+    elif statement.type in text_types:
+      TEXT += recursive_gen(statement)
+    elif statement.type in outer_types:
+      
 
   code = Code('x86 Assembly', final_code, '.asm')
   return code
