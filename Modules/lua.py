@@ -1,4 +1,0 @@
-
-
-def codegen(syntaxTree):
-  pass
