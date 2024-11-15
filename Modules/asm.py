@@ -12,7 +12,9 @@ class Code:
 MOV = 'mov '
 JMP = 'jmp '
 CALL = 'call '
-
+PUSH = 'push '
+POP = 'pop '
+RET = 'ret '
 
 #---------------- System calls
 
@@ -23,6 +25,10 @@ SYS_WRITE = 'mov eax, 4'
 
 STDOUT = 'mov ebx, 1'
 
+
+
+#-------
+nl = '\n'
 
 def recursive_gen(statement) -> str:
 
@@ -38,7 +44,8 @@ def recursive_gen(statement) -> str:
 
   elif statement.type == 'return':
     MAIN = ''
-    MAIN += 'ret'
+    MAIN += PUSH + 'eax' + nl
+    MAIN += RET + '\n'
     return MAIN
 
   elif statement.type == 'function':
@@ -70,9 +77,14 @@ def recursive_gen(statement) -> str:
     
     else:
       MAIN = ''
-      #push stack
+      for arg in statement.arguments:
+
+        MAIN += MOV + 'eax, ' + argument + nl
+        MAIN += PUSH + 'eax' + nl
+        
       
-      MAIN += CALL + statement.callee
+      MAIN += CALL + statement.callee + nl
+      MAIN += POP + 'eax' + nl
       return MAIN
       
     
