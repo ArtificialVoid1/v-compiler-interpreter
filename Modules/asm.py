@@ -36,10 +36,22 @@ def recursive_gen(statement) -> str:
 
   #-------------------- functions
 
+  elif statement.type == 'return':
+    MAIN = ''
+    MAIN += 'ret'
+    return MAIN
+
   elif statement.type == 'function':
     MAIN = ''
     MAIN += statement.name + ':\n'
 
+    for parameter in statement.parameters:
+      pass
+      #pop stack
+
+    for part in statement.body:
+      MAIN += recursive_gen(part) + '\n'
+    return MAIN
       
   elif statement.type == 'call'
     
@@ -58,6 +70,8 @@ def recursive_gen(statement) -> str:
     
     else:
       MAIN = ''
+      #push stack
+      
       MAIN += CALL + statement.callee
       return MAIN
       
@@ -87,13 +101,16 @@ def codegen(syntaxTree) -> Code:
 
     if statement.type in data_types:
       DATA += recursive_gen(statement)
-      
     elif statement.type in bss_types:
       BSS += recursive_gen(statement)
-
     elif statement.type in text_types:
       TEXT += recursive_gen(statement)
     elif statement.type in outer_types:
+      OUTER ++ recursive_gen(statement)
+    elif statement.type in main_types:
+      MAIN += recursive_gen(statement)
+
+  final_code = DATA + BSS + TEXT + OUTER + MAIN
       
 
   code = Code('x86 Assembly', final_code, '.asm')
